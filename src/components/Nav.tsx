@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Theme } from '../types';
 
 interface NavProps {
@@ -37,9 +38,32 @@ export function Nav({ theme, onToggleTheme, onGoHome }: NavProps) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
+        <StudioLink />
         <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       </div>
     </nav>
+  );
+}
+
+function StudioLink() {
+  return (
+    <Link
+      href="/studio"
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: 'var(--text-faint)',
+        textDecoration: 'none',
+        transition: 'color 0.2s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-faint)'; }}
+    >
+      Studio
+    </Link>
   );
 }
 

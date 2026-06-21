@@ -4,8 +4,9 @@ import type { Theme } from '../types';
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     try {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
-      return mq.matches ? 'dark' : 'light';
+      const saved = localStorage.getItem('theme') as Theme | null;
+      if (saved === 'light' || saved === 'dark') return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } catch {
       return 'light';
     }
@@ -13,6 +14,7 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('theme', theme); } catch {}
   }, [theme]);
 
   const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
