@@ -19,6 +19,16 @@ html, body {
   --accent-bright: #d99a2b;
   --accent-on: #251b06;
   --avatar-bg: #ece3d2;
+  --callout-blue: #4a9eff;
+  --callout-blue-bg: rgba(74,158,255,0.08);
+  --callout-green: #34c47c;
+  --callout-green-bg: rgba(52,196,124,0.08);
+  --callout-orange: #f5a623;
+  --callout-orange-bg: rgba(245,166,35,0.08);
+  --callout-red: #e05555;
+  --callout-red-bg: rgba(224,85,85,0.08);
+  --callout-purple: #9b6dff;
+  --callout-purple-bg: rgba(155,109,255,0.08);
 }
 
 [data-theme="dark"] {
@@ -33,6 +43,16 @@ html, body {
   --accent-bright: #caa056;
   --accent-on: #1a1408;
   --avatar-bg: #272118;
+  --callout-blue: #4a9eff;
+  --callout-blue-bg: rgba(74,158,255,0.08);
+  --callout-green: #34c47c;
+  --callout-green-bg: rgba(52,196,124,0.08);
+  --callout-orange: #f5a623;
+  --callout-orange-bg: rgba(245,166,35,0.08);
+  --callout-red: #e05555;
+  --callout-red-bg: rgba(224,85,85,0.08);
+  --callout-purple: #9b6dff;
+  --callout-purple-bg: rgba(155,109,255,0.08);
 }
 
 ::selection {

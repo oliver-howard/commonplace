@@ -1,8 +1,68 @@
 'use client'
-import { useState } from 'react';
-import { PortableText } from '@portabletext/react';
+import { useState, useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { visit } from 'unist-util-visit';
+import type { Element } from 'hast';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { Post } from '../types';
 import { ImageSlot } from './ImageSlot';
+import { useTheme } from '@/hooks/useTheme';
+
+type PrismStyle = Record<string, CSSProperties>;
+
+function stripTokenBackgrounds(style: PrismStyle): PrismStyle {
+  return Object.fromEntries(
+    Object.entries(style).map(([k, v]) => {
+      const isContainer = k.includes('pre[') || k.includes('code[');
+      return [k, { ...v, background: undefined, backgroundColor: undefined, ...(isContainer && { color: undefined }) }];
+    })
+  );
+}
+
+const lightStyle = stripTokenBackgrounds(oneLight);
+const darkStyle = stripTokenBackgrounds(oneDark);
+
+// Remark plugin: parse Obsidian callout syntax > [!type] Title
+function remarkObsidianCallout() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tree: any) => {
+    visit(tree, 'blockquote', (node: any) => {
+      const first = node.children[0];
+      if (first?.type !== 'paragraph') return;
+      const text = first.children[0];
+      if (text?.type !== 'text') return;
+      const match = /^\[!(\w+)\][ \t]*(.*)/.exec(text.value);
+      if (!match) return;
+      const [, type, title] = match;
+      node.data = { ...node.data, hProperties: { 'data-callout': type.toLowerCase(), 'data-title': title.trim() || type } };
+      text.value = text.value.replace(/^\[!\w+\][^\n]*\n?/, '');
+      if (!text.value.trim() && first.children.length === 1) node.children.shift();
+    });
+  };
+}
+
+const CALLOUT_COLOURS: Record<string, { border: string; bg: string; label: string }> = {
+  info:      { border: 'var(--callout-blue)',   bg: 'var(--callout-blue-bg)',   label: 'var(--callout-blue)' },
+  note:      { border: 'var(--callout-blue)',   bg: 'var(--callout-blue-bg)',   label: 'var(--callout-blue)' },
+  tip:       { border: 'var(--callout-green)',  bg: 'var(--callout-green-bg)',  label: 'var(--callout-green)' },
+  hint:      { border: 'var(--callout-green)',  bg: 'var(--callout-green-bg)',  label: 'var(--callout-green)' },
+  success:   { border: 'var(--callout-green)',  bg: 'var(--callout-green-bg)',  label: 'var(--callout-green)' },
+  warning:   { border: 'var(--callout-orange)', bg: 'var(--callout-orange-bg)', label: 'var(--callout-orange)' },
+  caution:   { border: 'var(--callout-orange)', bg: 'var(--callout-orange-bg)', label: 'var(--callout-orange)' },
+  attention: { border: 'var(--callout-orange)', bg: 'var(--callout-orange-bg)', label: 'var(--callout-orange)' },
+  danger:    { border: 'var(--callout-red)',    bg: 'var(--callout-red-bg)',    label: 'var(--callout-red)' },
+  error:     { border: 'var(--callout-red)',    bg: 'var(--callout-red-bg)',    label: 'var(--callout-red)' },
+  bug:       { border: 'var(--callout-red)',    bg: 'var(--callout-red-bg)',    label: 'var(--callout-red)' },
+  abstract:  { border: 'var(--callout-purple)', bg: 'var(--callout-purple-bg)', label: 'var(--callout-purple)' },
+  summary:   { border: 'var(--callout-purple)', bg: 'var(--callout-purple-bg)', label: 'var(--callout-purple)' },
+  tldr:      { border: 'var(--callout-purple)', bg: 'var(--callout-purple-bg)', label: 'var(--callout-purple)' },
+  question:  { border: 'var(--callout-orange)', bg: 'var(--callout-orange-bg)', label: 'var(--callout-orange)' },
+  example:   { border: 'var(--callout-purple)', bg: 'var(--callout-purple-bg)', label: 'var(--callout-purple)' },
+  quote:     { border: 'var(--border)',          bg: 'transparent',              label: 'var(--text-soft)' },
+};
 
 interface ArticleViewProps {
   post: Post;
@@ -11,29 +71,84 @@ interface ArticleViewProps {
   onOpenPost: (id: string) => void;
 }
 
-const portableTextComponents = {
-  block: {
-    normal: ({ children }: { children?: React.ReactNode }) => (
-      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 19, lineHeight: 1.78, color: 'var(--text)', margin: '0 0 24px' }}>
-        {children}
-      </p>
+function buildMarkdownComponents(theme: 'light' | 'dark'): React.ComponentProps<typeof ReactMarkdown>['components'] {
+  return {
+    p: ({ children }) => (
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 19, lineHeight: 1.78, color: 'var(--text)', margin: '0 0 24px' }}>{children}</p>
     ),
-    h2: ({ children }: { children?: React.ReactNode }) => (
-      <h2 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 27, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>
-        {children}
-      </h2>
+    h2: ({ children }) => (
+      <h2 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 27, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>{children}</h2>
     ),
-    h3: ({ children }: { children?: React.ReactNode }) => (
-      <h3 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 24, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>
-        {children}
-      </h3>
+    h3: ({ children }) => (
+      <h3 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 24, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>{children}</h3>
     ),
-    blockquote: ({ children }: { children?: React.ReactNode }) => (
-      <blockquote style={{ fontFamily: "'Newsreader', serif", fontStyle: 'italic', fontSize: 27, lineHeight: 1.38, color: 'var(--text)', borderLeft: '3px solid var(--accent)', paddingLeft: 26, margin: '38px 0' }}>
-        {children}
-      </blockquote>
+    blockquote: ({ children, node }) => {
+      const props = (node as Element)?.properties ?? {};
+      const type = props['data-callout'] as string | undefined;
+      if (type) {
+        const colour = CALLOUT_COLOURS[type] ?? CALLOUT_COLOURS['info'];
+        const title = (props['data-title'] as string) || type;
+        return (
+          <div style={{ borderLeft: `3px solid ${colour.border}`, background: colour.bg, borderRadius: '0 6px 6px 0', padding: '14px 18px', margin: '28px 0' }}>
+            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: colour.label, marginBottom: children ? 8 : 0 }}>{title}</div>
+            {children}
+          </div>
+        );
+      }
+      return <blockquote style={{ fontFamily: "'Newsreader', serif", fontStyle: 'italic', fontSize: 27, lineHeight: 1.38, color: 'var(--text)', borderLeft: '3px solid var(--accent)', paddingLeft: 26, margin: '38px 0' }}>{children}</blockquote>;
+    },
+    pre: ({ children }) => <>{children}</>,
+    code: ({ children, className }) => {
+      const match = /language-(\w+)/.exec(className || '');
+      const content = String(children).replace(/\n$/, '');
+      if (match) {
+        return (
+          <SyntaxHighlighter
+            language={match[1]}
+            style={theme === 'dark' ? darkStyle : lightStyle}
+            customStyle={{ borderRadius: 6, border: '1px solid var(--hair)', margin: '28px 0', fontSize: 15, background: 'var(--bg-elev)', color: 'var(--text)' }}
+            PreTag="div"
+          >
+            {content}
+          </SyntaxHighlighter>
+        );
+      }
+      if (content.includes('\n')) {
+        return (
+          <pre style={{ background: 'var(--bg-elev)', border: '1px solid var(--hair)', borderRadius: 6, padding: '16px 20px', overflowX: 'auto', margin: '28px 0' }}>
+            <code style={{ fontFamily: 'monospace', fontSize: 15, color: 'var(--text)' }}>{children}</code>
+          </pre>
+        );
+      }
+      return (
+        <code style={{ fontFamily: 'monospace', fontSize: '0.88em', background: 'var(--bg-elev)', borderRadius: 3, padding: '2px 6px', border: '1px solid var(--hair)', color: 'var(--text)' }}>{children}</code>
+      );
+    },
+    table: ({ children }) => (
+      <div style={{ overflowX: 'auto', margin: '28px 0' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: "'Inter', sans-serif", fontSize: 15 }}>{children}</table>
+      </div>
     ),
-  },
+    th: ({ children }) => (
+      <th style={{ textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid var(--hair)', color: 'var(--text)', fontWeight: 600 }}>{children}</th>
+    ),
+    td: ({ children }) => (
+      <td style={{ padding: '10px 14px', borderBottom: '1px solid var(--hair)', color: 'var(--text)' }}>{children}</td>
+    ),
+    li: ({ children, className }) => {
+      const isTask = className === 'task-list-item';
+      return (
+        <li style={{ fontFamily: "'Inter', sans-serif", fontSize: 19, lineHeight: 1.78, color: 'var(--text)', listStyle: isTask ? 'none' : undefined, marginLeft: isTask ? -20 : undefined }}>
+          {children}
+        </li>
+      );
+    },
+    input: ({ checked }) => (
+      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: 3, border: '1.5px solid', borderColor: checked ? 'var(--accent)' : 'var(--border)', background: checked ? 'var(--accent)' : 'transparent', marginRight: 8, verticalAlign: 'middle', flexShrink: 0, position: 'relative', top: -1 }}>
+        {checked && <span style={{ color: 'var(--accent-on)', fontSize: 10, fontWeight: 700, lineHeight: 1 }}>✓</span>}
+      </span>
+    ),
+  };
 }
 
 function RelatedCard({ post, onOpen }: { post: Post; onOpen: () => void }) {
@@ -73,6 +188,9 @@ function RelatedCard({ post, onOpen }: { post: Post; onOpen: () => void }) {
 }
 
 export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: ArticleViewProps) {
+  const { theme } = useTheme();
+  const markdownComponents = useMemo(() => buildMarkdownComponents(theme), [theme]);
+
   return (
     <article style={{ maxWidth: 880, margin: '0 auto', padding: '48px 32px 80px' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
@@ -101,10 +219,7 @@ export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: Articl
       <ImageSlot id={`hero-${post.id}`} src={post.coverImage} style={{ width: '100%', aspectRatio: '16/9', display: 'block', margin: '36px 0 44px' }} radius={8} />
 
       <div className="post-body" style={{ maxWidth: 680, margin: '0 auto' }}>
-        {post.body && post.body.length > 0
-          ? <PortableText value={post.body} components={portableTextComponents} />
-          : null
-        }
+        {post.body && <ReactMarkdown remarkPlugins={[remarkGfm, remarkObsidianCallout]} components={markdownComponents}>{post.body}</ReactMarkdown>}
       </div>
 
       <div style={{ maxWidth: 680, margin: '0 auto' }}>

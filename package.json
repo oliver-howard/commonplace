@@ -9,14 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@portabletext/react": "^6.2.0",
     "@sanity/image-url": "^1.1.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "next": "^16.2.9",
     "next-sanity": "^13.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "remark-gfm": "^4.0.1",
     "sanity": "^6.1.0",
-    "styled-components": "^6.4.2"
+    "sanity-plugin-markdown": "^9.0.0",
+    "styled-components": "^6.4.2",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

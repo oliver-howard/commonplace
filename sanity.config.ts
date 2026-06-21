@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { presentationTool } from 'sanity/presentation'
+import { markdownSchema } from 'sanity-plugin-markdown'
 import { schemaTypes } from './schemas'
 import { resolve } from './src/sanity/presentation/resolve'
 import { StudioNavbar } from './src/sanity/components/StudioNavbar'
@@ -17,6 +18,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    markdownSchema(),
     structureTool(),
     presentationTool({
       resolve,

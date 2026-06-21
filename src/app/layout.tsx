@@ -7,6 +7,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Commonplace.',
   description: 'A shared commonplace book.',
+  icons: { icon: '/favicon.svg' },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

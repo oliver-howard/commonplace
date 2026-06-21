@@ -26,6 +26,6 @@ export default defineType({
     defineField({ name: 'publishedAt', type: 'datetime' }),
     defineField({ name: 'readTime', title: 'Read time (e.g. "7 min")', type: 'string' }),
     defineField({ name: 'mainImage', type: 'image', options: { hotspot: true } }),
-    defineField({ name: 'body', type: 'array', of: [{ type: 'block' }] }),
+    defineField({ name: 'body', type: 'markdown' }),
   ],
 })
