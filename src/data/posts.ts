@@ -11,5 +11,3 @@ export const POSTS: Post[] = [
   { id: 'letters', category: 'Ponderings', title: "Letters I Didn't Send", deck: 'A drawer full of almosts, and what they turned out to mean.', author: 'Priya Nair', initials: 'PN', date: 'Apr 22, 2026', read: '6 min', bodyIndex: 0 },
   { id: 'quiet-apartment', category: 'Updates', title: 'The Apartment Is Finally Quiet', deck: 'The boxes are gone. So is the person who packed half of them.', author: 'June Park', initials: 'JP', date: 'Apr 16, 2026', read: '7 min', bodyIndex: 1 },
 ];
-
-export const CATEGORIES = ['All', 'Updates', 'Ponderings', 'Opinions', 'Field Notes'] as const;

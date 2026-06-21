@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type { Post } from '../types';
 import { CURRENTLY } from '../data/currently';
 import { ImageSlot } from './ImageSlot';
@@ -37,12 +37,24 @@ function HoverTitle({ children, fontSize = 24, style }: { children: React.ReactN
 }
 
 export function LayoutB({ posts, onOpenPost }: LayoutBProps) {
-  const p0 = posts[0];
-  const mainStack = posts.slice(1, 5);
-  const railList = posts.slice(0, 6).map((p, i) => ({ ...p, num: String(i + 1).padStart(2, '0') }));
-  const categories = ['Updates', 'Ponderings', 'Opinions', 'Field Notes'];
+  const [filterCategory, setFilterCategory] = useState('All');
 
-  if (!p0) return null;
+  const categories = useMemo(
+    () => ['All', ...Array.from(new Set(posts.map(p => p.category)))],
+    [posts],
+  );
+
+  const filtered = filterCategory === 'All' ? posts : posts.filter(p => p.category === filterCategory);
+
+  const p0 = filtered[0];
+  const mainStack = filtered.slice(1, 5);
+  const railList = filtered.slice(0, 6).map((p, i) => ({ ...p, num: String(i + 1).padStart(2, '0') }));
+
+  if (!p0) return (
+    <section style={{ maxWidth: 1180, margin: '0 auto', padding: '36px 32px 96px' }}>
+      <p style={{ fontFamily: "'Inter', sans-serif", color: 'var(--text-soft)', fontSize: 14 }}>No posts in this category.</p>
+    </section>
+  );
 
   return (
     <section style={{ maxWidth: 1180, margin: '0 auto', padding: '36px 32px 96px', display: 'grid', gridTemplateColumns: '1fr 320px', gap: 66, alignItems: 'start' }}>
@@ -118,14 +130,19 @@ export function LayoutB({ posts, onOpenPost }: LayoutBProps) {
           ))}
         </div>
 
-        {/* Browse categories */}
+        {/* Browse / filter by category */}
         <div style={{ marginTop: 30 }}>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-faint)', marginBottom: 14 }}>
             Browse
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {categories.map(cat => (
-              <CategoryPill key={cat} label={cat} />
+              <FilterChip
+                key={cat}
+                label={cat}
+                active={filterCategory === cat}
+                onClick={() => setFilterCategory(cat)}
+              />
             ))}
           </div>
         </div>
@@ -168,25 +185,28 @@ function RailItem({ post, onOpen }: { post: Post & { num: string }; onOpen: () =
   );
 }
 
-function CategoryPill({ label }: { label: string }) {
+function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <span
+    <button
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
         fontFamily: "'Inter', sans-serif",
         fontSize: 12,
-        color: hovered ? 'var(--accent)' : 'var(--text-soft)',
-        border: '1px solid',
-        borderColor: hovered ? 'var(--accent)' : 'var(--border)',
+        fontWeight: active ? 600 : 400,
         borderRadius: 999,
         padding: '6px 14px',
         cursor: 'pointer',
-        transition: 'border-color 0.2s, color 0.2s',
+        border: '1px solid',
+        transition: 'border-color 0.2s, background 0.2s, color 0.2s',
+        background: active ? 'var(--accent)' : 'transparent',
+        color: active ? 'var(--accent-on)' : hovered ? 'var(--accent)' : 'var(--text-soft)',
+        borderColor: active ? 'var(--accent)' : hovered ? 'var(--accent)' : 'var(--border)',
       }}
     >
       {label}
-    </span>
+    </button>
   );
 }
