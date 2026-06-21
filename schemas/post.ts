@@ -13,9 +13,9 @@ export default defineType({
       options: {
         list: [
           { title: 'Updates', value: 'Updates' },
-          { title: 'Ponderings', value: 'Ponderings' },
+          { title: 'Ideas', value: 'Ideas' },
           { title: 'Opinions', value: 'Opinions' },
-          { title: 'Field Notes', value: 'Field Notes' },
+          { title: 'Notes', value: 'Notes' },
         ],
         layout: 'radio',
       },
