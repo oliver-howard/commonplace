@@ -1,9 +1,8 @@
 import { useState, useMemo } from 'react';
 import type { Post } from '../types';
-import { CURRENTLY } from '../data/currently';
 import { ImageSlot } from './ImageSlot';
 
-interface LayoutBProps {
+interface HomeFeedProps {
   posts: Post[];
   onOpenPost: (id: string) => void;
 }
@@ -36,7 +35,7 @@ function HoverTitle({ children, fontSize = 24, style }: { children: React.ReactN
   );
 }
 
-export function LayoutB({ posts, onOpenPost }: LayoutBProps) {
+export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
   const [filterCategory, setFilterCategory] = useState('All');
 
   const categories = useMemo(
@@ -111,22 +110,6 @@ export function LayoutB({ posts, onOpenPost }: LayoutBProps) {
         <div>
           {railList.map(post => (
             <RailItem key={post.id} post={post} onOpen={() => onOpenPost(post.id)} />
-          ))}
-        </div>
-
-        {/* Currently widget */}
-        <div style={{ marginTop: 36, background: 'var(--bg-elev)', border: '1px solid var(--border)', borderRadius: 16, padding: 22 }}>
-          <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4 }}>
-            Currently
-          </div>
-          {CURRENTLY.map(c => (
-            <div key={c.who} style={{ padding: '13px 0', borderTop: '1px solid var(--hair)' }}>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
-                {c.who} <span style={{ color: 'var(--text-soft)', fontWeight: 400 }}>· {c.where}</span>
-              </div>
-              <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'var(--text-soft)', marginTop: 2 }}>{c.weather}</div>
-              <div style={{ fontFamily: "'Newsreader', serif", fontStyle: 'italic', fontSize: 14, color: 'var(--accent)', marginTop: 3 }}>{c.doing}</div>
-            </div>
           ))}
         </div>
 

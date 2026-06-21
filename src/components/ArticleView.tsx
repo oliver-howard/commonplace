@@ -1,7 +1,7 @@
+'use client'
 import { useState } from 'react';
-import type { Post, Block } from '../types';
-import { AUTHORS } from '../data/authors';
-import { BODIES } from '../data/bodies';
+import { PortableText } from '@portabletext/react';
+import type { Post } from '../types';
 import { ImageSlot } from './ImageSlot';
 
 interface ArticleViewProps {
@@ -11,27 +11,29 @@ interface ArticleViewProps {
   onOpenPost: (id: string) => void;
 }
 
-function BodyBlock({ block }: { block: Block }) {
-  switch (block.type) {
-    case 'p':
-      return (
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 19, lineHeight: 1.78, color: 'var(--text)', margin: '0 0 24px' }}>
-          {block.text}
-        </p>
-      );
-    case 'h':
-      return (
-        <h3 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 27, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>
-          {block.text}
-        </h3>
-      );
-    case 'q':
-      return (
-        <blockquote style={{ fontFamily: "'Newsreader', serif", fontStyle: 'italic', fontSize: 27, lineHeight: 1.38, color: 'var(--text)', borderLeft: '3px solid var(--accent)', paddingLeft: 26, margin: '38px 0' }}>
-          {block.text}
-        </blockquote>
-      );
-  }
+const portableTextComponents = {
+  block: {
+    normal: ({ children }: { children?: React.ReactNode }) => (
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 19, lineHeight: 1.78, color: 'var(--text)', margin: '0 0 24px' }}>
+        {children}
+      </p>
+    ),
+    h2: ({ children }: { children?: React.ReactNode }) => (
+      <h2 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 27, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>
+        {children}
+      </h2>
+    ),
+    h3: ({ children }: { children?: React.ReactNode }) => (
+      <h3 style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 24, lineHeight: 1.15, letterSpacing: '-0.012em', color: 'var(--text)', margin: '40px 0 16px' }}>
+        {children}
+      </h3>
+    ),
+    blockquote: ({ children }: { children?: React.ReactNode }) => (
+      <blockquote style={{ fontFamily: "'Newsreader', serif", fontStyle: 'italic', fontSize: 27, lineHeight: 1.38, color: 'var(--text)', borderLeft: '3px solid var(--accent)', paddingLeft: 26, margin: '38px 0' }}>
+        {children}
+      </blockquote>
+    ),
+  },
 }
 
 function RelatedCard({ post, onOpen }: { post: Post; onOpen: () => void }) {
@@ -71,12 +73,6 @@ function RelatedCard({ post, onOpen }: { post: Post; onOpen: () => void }) {
 }
 
 export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: ArticleViewProps) {
-  const body = BODIES[post.bodyIndex % BODIES.length];
-  const bodyTop = body.slice(0, 3);
-  const bodyBottom = body.slice(3);
-  const meta = AUTHORS[post.author] ?? { role: 'Contributor', text: '' };
-  const tags = [post.category, 'Life', 'Longform'];
-
   return (
     <article style={{ maxWidth: 880, margin: '0 auto', padding: '48px 32px 80px' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
@@ -105,25 +101,17 @@ export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: Articl
       <ImageSlot id={`hero-${post.id}`} style={{ width: '100%', aspectRatio: '16/9', display: 'block', margin: '36px 0 44px' }} radius={8} />
 
       <div className="post-body" style={{ maxWidth: 680, margin: '0 auto' }}>
-        {bodyTop.map((blk, i) => <BodyBlock key={i} block={blk} />)}
+        {post.body && post.body.length > 0
+          ? <PortableText value={post.body} components={portableTextComponents} />
+          : null
+        }
       </div>
 
-      <figure style={{ maxWidth: 880, margin: '48px auto' }}>
-        <ImageSlot id={`inline-${post.id}`} style={{ width: '100%', aspectRatio: '3/2', display: 'block' }} radius={8} />
-        <figcaption style={{ fontFamily: "'Inter', sans-serif", fontSize: 12.5, color: 'var(--text-faint)', marginTop: 12, textAlign: 'center' }}>
-          A photograph from somewhere along the way.
-        </figcaption>
-      </figure>
-
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
-        {bodyBottom.map((blk, i) => <BodyBlock key={i} block={blk} />)}
-
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, margin: '38px 0 0' }}>
-          {tags.map(tag => (
-            <span key={tag} style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'var(--text-soft)', border: '1px solid var(--border)', borderRadius: 999, padding: '6px 14px' }}>
-              {tag}
-            </span>
-          ))}
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'var(--text-soft)', border: '1px solid var(--border)', borderRadius: 999, padding: '6px 14px' }}>
+            {post.category}
+          </span>
         </div>
 
         <div style={{ display: 'flex', gap: 18, alignItems: 'flex-start', borderTop: '1px solid var(--hair)', paddingTop: 32, marginTop: 40 }}>
@@ -132,8 +120,6 @@ export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: Articl
           </span>
           <div>
             <div style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 19, color: 'var(--text)' }}>{post.author}</div>
-            <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent)', margin: '3px 0 9px' }}>{meta.role}</div>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14.5, lineHeight: 1.6, color: 'var(--text-soft)', margin: 0, maxWidth: '52ch' }}>{meta.text}</p>
           </div>
         </div>
       </div>

@@ -1,22 +1,18 @@
-'use client'
-import { useRouter } from 'next/navigation'
-import { useTheme } from '@/hooks/useTheme'
-import { POSTS } from '@/data/posts'
-import { Nav } from '@/components/Nav'
-import { Footer } from '@/components/Footer'
-import { LayoutB } from '@/components/LayoutB'
+import { sanityFetch } from '@/sanity/lib/live'
+import { ALL_POSTS_QUERY } from '@/sanity/lib/queries'
+import { HomePageClient } from './_client'
+import type { Post } from '@/types'
 
-export default function HomePage() {
-  const { theme, toggle } = useTheme()
-  const router = useRouter()
+export default async function HomePage() {
+  const { data } = await sanityFetch({ query: ALL_POSTS_QUERY })
+  const raw = data as Array<Post & { date: string }> | null
 
-  return (
-    <div style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh', fontFamily: "'Inter', sans-serif", WebkitFontSmoothing: 'antialiased' }}>
-      <Nav theme={theme} onToggleTheme={toggle} onGoHome={() => router.push('/')} />
-      <main className="screen-enter" style={{ paddingTop: 64, minHeight: '100vh' }}>
-        <LayoutB posts={POSTS} onOpenPost={(id) => router.push(`/${id}`)} />
-      </main>
-      <Footer />
-    </div>
-  )
+  const posts: Post[] = (raw ?? []).map(p => ({
+    ...p,
+    date: p.date
+      ? new Date(p.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      : '',
+  }))
+
+  return <HomePageClient posts={posts} />
 }

@@ -10,24 +10,6 @@ export interface Post {
   initials: string;
   date: string;
   read: string;
-  bodyIndex: number;
-}
-
-export interface Author {
-  role: string;
-  text: string;
-}
-
-export interface Currently {
-  who: string;
-  where: string;
-  weather: string;
-  doing: string;
-}
-
-export type BlockType = 'p' | 'h' | 'q';
-
-export interface Block {
-  type: BlockType;
-  text: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any[];
 }
