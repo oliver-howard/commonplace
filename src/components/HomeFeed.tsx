@@ -60,7 +60,7 @@ export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
       {/* Main column */}
       <div>
         <div onClick={() => onOpenPost(p0.id)} style={{ cursor: 'pointer' }}>
-          <ImageSlot id={`img-${p0.id}`} style={{ width: '100%', aspectRatio: '16/10', display: 'block', marginBottom: 26 }} radius={8} />
+          <ImageSlot id={`img-${p0.id}`} src={p0.coverImage} style={{ width: '100%', aspectRatio: '16/10', display: 'block', marginBottom: 26 }} radius={8} />
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 14 }}>
             {p0.category} · Featured
           </div>
@@ -87,7 +87,7 @@ export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
               onClick={() => onOpenPost(post.id)}
               style={{ display: 'grid', gridTemplateColumns: '138px 1fr', gap: 24, padding: '26px 0', borderBottom: '1px solid var(--hair)', cursor: 'pointer', alignItems: 'center' }}
             >
-              <ImageSlot id={`img-${post.id}`} style={{ width: 138, aspectRatio: '1.4/1', display: 'block' }} radius={6} />
+              <ImageSlot id={`img-${post.id}`} src={post.coverImage} style={{ width: 138, aspectRatio: '1.4/1', display: 'block' }} radius={6} />
               <div>
                 <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 10.5, fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 9 }}>
                   {post.category}

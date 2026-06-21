@@ -9,7 +9,8 @@ export const ALL_POSTS_QUERY = defineQuery(`
     author,
     initials,
     "date": coalesce(publishedAt, _createdAt),
-    "read": readTime
+    "read": readTime,
+    "coverImage": mainImage.asset->url
   }
 `)
 
@@ -23,6 +24,7 @@ export const POST_BY_SLUG_QUERY = defineQuery(`
     initials,
     "date": coalesce(publishedAt, _createdAt),
     "read": readTime,
+    "coverImage": mainImage.asset->url,
     body
   }
 `)

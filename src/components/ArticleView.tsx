@@ -98,7 +98,7 @@ export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: Articl
         </div>
       </div>
 
-      <ImageSlot id={`hero-${post.id}`} style={{ width: '100%', aspectRatio: '16/9', display: 'block', margin: '36px 0 44px' }} radius={8} />
+      <ImageSlot id={`hero-${post.id}`} src={post.coverImage} style={{ width: '100%', aspectRatio: '16/9', display: 'block', margin: '36px 0 44px' }} radius={8} />
 
       <div className="post-body" style={{ maxWidth: 680, margin: '0 auto' }}>
         {post.body && post.body.length > 0

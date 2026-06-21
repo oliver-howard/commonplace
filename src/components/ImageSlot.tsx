@@ -13,11 +13,25 @@ function colorFor(id: string): string {
 
 interface ImageSlotProps {
   id: string;
+  src?: string;
   style?: CSSProperties;
   radius?: number;
 }
 
-export function ImageSlot({ id, style, radius = 6 }: ImageSlotProps) {
+export function ImageSlot({ id, src, style, radius = 6 }: ImageSlotProps) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt=""
+        style={{
+          objectFit: 'cover',
+          borderRadius: radius,
+          ...style,
+        }}
+      />
+    );
+  }
   return (
     <div
       style={{
