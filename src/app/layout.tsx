@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   title: 'Commonplace.',
   description: 'A shared commonplace book.',
   icons: { icon: '/favicon.svg' },
+  openGraph: {
+    title: 'Commonplace.',
+    description: 'A shared commonplace book.',
+    images: [{ url: '/banner.png', width: 1024, height: 512 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/banner.png'],
+  },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
