@@ -51,13 +51,13 @@ export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
   const railList = filtered.slice(0, 6).map((p, i) => ({ ...p, num: String(i + 1).padStart(2, '0') }));
 
   if (!p0) return (
-    <section style={{ maxWidth: 1180, margin: '0 auto', padding: '36px 32px 96px' }}>
+    <section className="home-grid">
       <p style={{ fontFamily: "'Inter', sans-serif", color: 'var(--text-soft)', fontSize: 14 }}>No posts in this category.</p>
     </section>
   );
 
   return (
-    <section style={{ maxWidth: 1180, margin: '0 auto', padding: '36px 32px 96px', display: 'grid', gridTemplateColumns: '1fr 320px', gap: 66, alignItems: 'start' }}>
+    <section className="home-grid">
       {/* Main column */}
       <div>
         <div onClick={() => onOpenPost(p0.id)} style={{ cursor: 'pointer' }}>

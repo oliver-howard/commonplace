@@ -78,3 +78,25 @@ html, body {
 .screen-enter {
   animation: screenEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+.home-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 32px 96px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 66px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 24px 20px 72px;
+  }
+
+  .home-grid aside {
+    order: -1;
+  }
+}
