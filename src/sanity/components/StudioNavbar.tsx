@@ -1,6 +1,7 @@
-import type { NavbarProps } from 'sanity'
+import { useColorScheme, type NavbarProps } from 'sanity'
 
 export function StudioNavbar(props: NavbarProps) {
+  const { scheme } = useColorScheme()
   return (
     <div style={{ display: 'flex', alignItems: 'center', width: '100%', position: 'relative', justifyContent: 'center' }}>
       <a
@@ -14,7 +15,7 @@ export function StudioNavbar(props: NavbarProps) {
           padding: '0 16px',
           fontSize: '13px',
           fontWeight: 500,
-          color: 'var(--card-fg-color)',
+          color: scheme === 'dark' ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.7)',
           textDecoration: 'none',
           whiteSpace: 'nowrap',
           opacity: 0.7,
