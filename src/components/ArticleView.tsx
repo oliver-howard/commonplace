@@ -10,6 +10,7 @@ import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/pris
 import type { Post } from '../types';
 import { ImageSlot } from './ImageSlot';
 import { useTheme } from '@/hooks/useTheme';
+import { NewsletterSection } from './NewsletterSignup';
 
 type PrismStyle = Record<string, CSSProperties>;
 
@@ -237,6 +238,10 @@ export function ArticleView({ post, relatedPosts, onGoHome, onOpenPost }: Articl
             <div style={{ fontFamily: "'Newsreader', serif", fontWeight: 600, fontSize: 19, color: 'var(--text)' }}>{post.author}</div>
           </div>
         </div>
+      </div>
+
+      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+        <NewsletterSection />
       </div>
 
       {relatedPosts.length > 0 && (

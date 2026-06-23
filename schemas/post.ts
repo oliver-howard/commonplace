@@ -12,9 +12,9 @@ export default defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Updates', value: 'Updates' },
-          { title: 'Ideas', value: 'Ideas' },
-          { title: 'Opinions', value: 'Opinions' },
+          { title: 'Update', value: 'Update' },
+          { title: 'Idea', value: 'Idea' },
+          { title: 'Opinion', value: 'Opinion' },
           { title: 'Notes', value: 'Notes' },
         ],
         layout: 'radio',

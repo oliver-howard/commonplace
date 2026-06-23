@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { Post } from '../types';
 import { ImageSlot } from './ImageSlot';
+import { NewsletterSection } from './NewsletterSignup';
 
 interface HomeFeedProps {
   posts: Post[];
@@ -130,6 +131,10 @@ export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
           </div>
         </div>
       </aside>
+
+      <div style={{ gridColumn: '1 / -1' }}>
+        <NewsletterSection />
+      </div>
     </section>
   );
 }

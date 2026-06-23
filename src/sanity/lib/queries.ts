@@ -1,5 +1,16 @@
 import { defineQuery } from 'groq'
 
+export const WEEKLY_POSTS_QUERY = defineQuery(`
+  *[_type == "post" && publishedAt > $since] | order(publishedAt desc) [0..4] {
+    "id": slug.current,
+    title,
+    deck,
+    author,
+    "date": coalesce(publishedAt, _createdAt),
+    body
+  }
+`)
+
 export const ALL_POSTS_QUERY = defineQuery(`
   *[_type == "post"] | order(publishedAt desc) {
     "id": slug.current,
