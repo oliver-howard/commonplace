@@ -3,6 +3,9 @@ import { type LayoutProps } from 'sanity'
 // CSS directly overrides @sanity/ui's --card-* custom properties.
 // Sanity cards use data-scheme + data-tone attributes; targeting those
 // attributes with !important wins over the styled-component class rules.
+// CLAUDE.md exception: hex literals and a <style> block are intentional here —
+// @sanity/ui's CSS-in-JS cannot be overridden with var(--*) tokens or inline
+// styles injected from outside its component tree.
 const LIGHT = {
   bg: '#ddd3be',
   bgElev: '#f4efe4',
@@ -68,12 +71,10 @@ const THEME_CSS = `
     --card-skeleton-color-to: ${DARK.bgElev} !important;
   }
 
-  [data-scheme="light"] body,
   [data-scheme="light"][data-ui="Card"] {
     background-color: ${LIGHT.bg};
   }
 
-  [data-scheme="dark"] body,
   [data-scheme="dark"][data-ui="Card"] {
     background-color: ${DARK.bg};
   }

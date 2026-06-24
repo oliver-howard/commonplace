@@ -1,10 +1,32 @@
 import { defineField, defineType } from 'sanity'
+import { canModify } from '../src/sanity/lib/ownership'
 
 export default defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  // Auto-stamp the creator's Sanity user id on new posts.
+  // Guard against empty-string ids (service accounts) — store undefined instead
+  // so the post is treated as unowned rather than locked to an unmatchable owner.
+  initialValue: (_params, { currentUser }) => ({
+    ownerId: currentUser?.id || undefined,
+  }),
+  // Lock the whole form for anyone who isn't the owner (or an admin).
+  // Unowned legacy posts stay editable. See ownership.ts for the caveat.
+  // currentUser is null during auth load — return false (unlocked) so the owner
+  // isn't stuck with a read-only form before their session resolves.
+  readOnly: ({ document, currentUser }) => {
+    if (!currentUser) return false
+    return !canModify(document?.ownerId as string | undefined, currentUser)
+  },
   fields: [
+    defineField({
+      name: 'ownerId',
+      title: 'Owner',
+      type: 'string',
+      readOnly: true,
+      hidden: true,
+    }),
     defineField({ name: 'title', type: 'string', validation: r => r.required() }),
     defineField({ name: 'slug', type: 'slug', options: { source: 'title' }, validation: r => r.required() }),
     defineField({

@@ -4,6 +4,7 @@ import { presentationTool } from 'sanity/presentation'
 import { markdownSchema } from 'sanity-plugin-markdown'
 import { schemaTypes } from './schemas'
 import { resolve } from './src/sanity/presentation/resolve'
+import { documentActions } from './src/sanity/lib/actions'
 import { StudioNavbar } from './src/sanity/components/StudioNavbar'
 import { StudioLayout } from './src/sanity/components/StudioLayout'
 
@@ -33,4 +34,7 @@ export default defineConfig({
     }),
   ],
   schema: { types: schemaTypes },
+  document: {
+    actions: documentActions,
+  },
 })
