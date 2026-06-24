@@ -5,6 +5,7 @@ import { markdownSchema } from 'sanity-plugin-markdown'
 import { schemaTypes } from './schemas'
 import { resolve } from './src/sanity/presentation/resolve'
 import { StudioNavbar } from './src/sanity/components/StudioNavbar'
+import { StudioLayout } from './src/sanity/components/StudioLayout'
 
 export default defineConfig({
   name: 'default',
@@ -15,6 +16,7 @@ export default defineConfig({
   studio: {
     components: {
       navbar: StudioNavbar,
+      layout: StudioLayout,
     },
   },
   plugins: [
