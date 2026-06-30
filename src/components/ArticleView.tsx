@@ -144,6 +144,13 @@ function buildMarkdownComponents(theme: 'light' | 'dark'): React.ComponentProps<
         </li>
       );
     },
+    img: ({ src, alt }) => (
+      <img
+        src={src}
+        alt={alt ?? ''}
+        style={{ display: 'block', maxWidth: '100%', maxHeight: 560, width: 'auto', height: 'auto', borderRadius: 6, margin: '28px auto' }}
+      />
+    ),
     input: ({ checked }) => (
       <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: 3, border: '1.5px solid', borderColor: checked ? 'var(--accent)' : 'var(--border)', background: checked ? 'var(--accent)' : 'transparent', marginRight: 8, verticalAlign: 'middle', flexShrink: 0, position: 'relative', top: -1 }}>
         {checked && <span style={{ color: 'var(--accent-on)', fontSize: 10, fontWeight: 700, lineHeight: 1 }}>✓</span>}
