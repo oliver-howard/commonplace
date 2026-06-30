@@ -7,12 +7,7 @@ import WeeklyDigest from '@/email/WeeklyDigest'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function POST(req: NextRequest) {
-  const auth = req.headers.get('authorization')
-  if (!process.env.DIGEST_SECRET || auth !== `Bearer ${process.env.DIGEST_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+async function sendDigest(): Promise<NextResponse> {
   const audienceId = process.env.RESEND_AUDIENCE_ID
   const from = process.env.RESEND_FROM_EMAIL
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
@@ -47,4 +42,22 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ broadcastId: data?.id, posts: posts.length })
+}
+
+// Vercel Cron Job — runs every Sunday at 9:00 AM PST (17:00 UTC)
+export async function GET(req: NextRequest) {
+  const auth = req.headers.get('authorization')
+  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return sendDigest()
+}
+
+// Manual trigger via old static API key (kept for backwards compatibility)
+export async function POST(req: NextRequest) {
+  const auth = req.headers.get('authorization')
+  if (!process.env.DIGEST_SECRET || auth !== `Bearer ${process.env.DIGEST_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return sendDigest()
 }
