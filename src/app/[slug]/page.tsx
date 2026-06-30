@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { sanityFetch } from '@/sanity/lib/live'
 import { POST_BY_SLUG_QUERY, ALL_POSTS_QUERY } from '@/sanity/lib/queries'
 import { ArticlePageClient } from './_client'
@@ -12,6 +13,30 @@ function formatDate(iso: string) {
 
 function sanityToPost(p: Post & { date: string }): Post {
   return { ...p, date: formatDate(p.date) }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const { data: rawPost } = await sanityFetch({ query: POST_BY_SLUG_QUERY, params: { slug } })
+  const post = rawPost as (Post & { date: string }) | null
+
+  const ogImage = post?.coverImage ?? '/banner.png'
+  const title = post?.title ? `${post.title} — Commonplace.` : 'Commonplace.'
+  const description = post?.deck ?? 'A shared commonplace book.'
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [ogImage],
+    },
+  }
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
