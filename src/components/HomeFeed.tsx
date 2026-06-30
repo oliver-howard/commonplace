@@ -40,7 +40,7 @@ export function HomeFeed({ posts, onOpenPost }: HomeFeedProps) {
   const [filterCategory, setFilterCategory] = useState('All');
 
   const categories = useMemo(
-    () => ['All', ...Array.from(new Set(posts.map(p => p.category)))],
+    () => ['All', ...Array.from(new Set(posts.map(p => p.category?.trim()).filter(Boolean)))],
     [posts],
   );
 
